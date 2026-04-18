@@ -1,0 +1,175 @@
+
+
+# 🤖 NekBot — Flask Chatbot
+
+A conversational chatbot built with **Python**, **Flask**, and **ChatterBot**, trained on custom Q&A data and the built-in English corpus. Ask it questions, get answers — and it keeps learning.
+
+---
+
+## ✨ Features
+
+- 💬 Natural language responses using ChatterBot's `BestMatch` logic
+- ➕ Mathematical evaluation (e.g. *"What is 5 + 3?"*)
+- 🕐 Time queries via `TimeLogicAdapter`
+- 📚 Custom training from JSON and TXT files
+- 🌐 Simple web UI served via Flask
+- 🗄️ SQLite-backed persistent storage
+
+---
+
+## 🗂️ Project Structure
+
+```
+nekbot/
+├── app.py                        ← Flask web server & routes
+├── chatbot.py                    ← ChatterBot setup and training logic
+├── training_data/
+│   ├── personal_ques.json        ← Personal Q&A in JSON format
+│   ├── ques_ans.json             ← General Q&A in JSON format
+│   ├── personal_ques.txt         ← Personal Q&A in plain text
+│   └── ques_ans.txt              ← General Q&A in plain text
+├── templates/
+│   └── index.html                ← Chat UI template
+├── static/                       ← CSS, JS, images
+└── README.md
+```
+
+---
+
+## ⚙️ Prerequisites
+
+- Python 3.6 – 3.8 (ChatterBot has limited support beyond 3.8)
+- pip
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/<your-username>/nekbot.git
+cd nekbot
+```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install flask chatterbot chatterbot-corpus
+```
+
+> If you encounter install issues with ChatterBot on newer Python versions, try:
+> ```bash
+> pip install chatterbot==1.0.4 chatterbot-corpus
+> ```
+
+### 4. Prepare training data
+
+Make sure the following files exist inside a `training_data/` folder:
+
+| File | Format | Description |
+|------|--------|-------------|
+| `personal_ques.json` | JSON | Personal questions with `question` / `answer` keys |
+| `ques_ans.json` | JSON | General Q&A pairs |
+| `personal_ques.txt` | Plain text | One question/answer per line |
+| `ques_ans.txt` | Plain text | One question/answer per line |
+
+**JSON format example:**
+```json
+{
+  "intents": [
+    { "question": "What is your name?", "answer": "I am NekBot!" },
+    { "question": "Who made you?",      "answer": "I was built with Python and ChatterBot." }
+  ]
+}
+```
+
+### 5. Run the app
+
+```bash
+python app.py
+```
+
+Open your browser and navigate to `http://127.0.0.1:5000`
+
+---
+
+## 🔌 API Reference
+
+### `GET /`
+Returns the main chat interface (`index.html`).
+
+### `GET /get?msg=<user_message>`
+Returns the bot's response as plain text.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `msg` | string | The message sent by the user |
+
+**Example:**
+```
+GET /get?msg=Hello
+→ "Hi there! How can I help you?"
+```
+
+---
+
+## 🧠 How Training Works
+
+On startup, `chatbot.py` runs the following training pipeline:
+
+1. **JSON training** — Reads `personal_ques.json` and `ques_ans.json`, extracts question/answer pairs into a flat list, and trains using `ListTrainer`
+2. **Text training** — Reads `.txt` training files and trains using `ListTrainer`
+3. **Corpus training** — Trains on ChatterBot's built-in English corpus including greetings and conversations
+
+Trained data is persisted to a local SQLite database so the bot doesn't retrain from scratch on every run.
+
+---
+
+## 🛠️ Configuration
+
+You can customise the bot's behaviour in `chatbot.py`:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `maximum_similarity_threshold` | `0.90` | Confidence required to match a response |
+| `default_response` | `"I am sorry..."` | Fallback when no match is found |
+| `storage_adapter` | `SQLStorageAdapter` | Change to MongoDB etc. if needed |
+| `database_uri` | In-memory | Uncomment `sqlite:///database.sqlite3` to persist |
+
+---
+
+## 📦 Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `flask` | Web framework |
+| `chatterbot` | Chatbot engine |
+| `chatterbot-corpus` | Pre-built English training corpus |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-improvement`
+3. Commit your changes: `git commit -m "Add my improvement"`
+4. Push and open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
